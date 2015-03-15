@@ -29,11 +29,11 @@ class WSU_Extended_Events_Calendar {
 			return $_post;
 		}
 
-		$_post['meta']['event_city'] = tribe_get_city( $post['ID'] );
-		$_post['meta']['event_state'] = tribe_get_state( $post['ID'] );
-		$_post['meta']['event_venue'] = tribe_get_venue( $post['ID'] );
-		$_post['meta']['start_date'] = get_post_meta( $post['ID'], '_EventStartDate', true );
-		$_post['meta']['end_date'] = get_post_meta( $post['ID'], '_EventEndDate', true );
+		$_post['meta']['event_city'] = esc_html( tribe_get_city( $post['ID'] ) );
+		$_post['meta']['event_state'] = esc_html( tribe_get_state( $post['ID'] ) );
+		$_post['meta']['event_venue'] = esc_html( tribe_get_venue( $post['ID'] ) );
+		$_post['meta']['start_date'] = esc_html( get_post_meta( $post['ID'], '_EventStartDate', true ) );
+		$_post['meta']['end_date'] = esc_html( get_post_meta( $post['ID'], '_EventEndDate', true ) );
 
 		return $_post;
 	}
