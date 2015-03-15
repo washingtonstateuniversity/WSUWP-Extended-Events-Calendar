@@ -29,6 +29,7 @@ class WSU_Extended_Events_Calendar {
 			return $_post;
 		}
 
+		$_post['meta']['event_venue'] = tribe_get_venue( $post['ID'] );
 		$_post['meta']['start_date'] = get_post_meta( $post['ID'], '_EventStartDate', true );
 		$_post['meta']['end_date'] = get_post_meta( $post['ID'], '_EventEndDate', true );
 
