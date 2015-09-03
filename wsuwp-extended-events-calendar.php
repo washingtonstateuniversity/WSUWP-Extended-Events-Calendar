@@ -14,6 +14,7 @@ class WSU_Extended_Events_Calendar {
 	 */
 	public function __construct() {
 		add_filter( 'json_prepare_post', array( $this, 'prepare_calendar_event' ), 10, 2 );
+		add_filter( 'tribe_events_pro_recurrence_batch_size', array( $this, 'limit_recurring_batch_size' ), 10 );
 	}
 
 	/**
@@ -36,6 +37,17 @@ class WSU_Extended_Events_Calendar {
 		$_post['meta']['end_date'] = esc_html( get_post_meta( $post['ID'], '_EventEndDate', true ) );
 
 		return $_post;
+	}
+
+	/**
+	 * Set the default size of a batch to process during cron when running through recurring
+	 * event queues. The default is 100, which may or may not be the reason things are timing
+	 * out at 30 seconds.
+	 *
+	 * @return int
+	 */
+	public function limit_recurring_batch_size() {
+		return 5;
 	}
 }
 new WSU_Extended_Events_Calendar();
