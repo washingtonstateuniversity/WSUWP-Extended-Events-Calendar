@@ -15,6 +15,7 @@ class WSU_Extended_Events_Calendar {
 	public function __construct() {
 		add_filter( 'json_prepare_post', array( $this, 'prepare_calendar_event' ), 10, 2 );
 		add_filter( 'tribe_events_pro_recurrence_batch_size', array( $this, 'limit_recurring_batch_size' ), 10 );
+		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
 	}
 
 	/**
@@ -48,6 +49,20 @@ class WSU_Extended_Events_Calendar {
 	 */
 	public function limit_recurring_batch_size() {
 		return 5;
+	}
+
+	/**
+	 * Update the `register_post_type()` arguments for The Events Calendar to support an /events/ endpoint.
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public function register_events_endpoint( $args ) {
+		$args['show_in_rest'] = true;
+		$args['rest_base'] = 'events';
+
+		return $args;
 	}
 }
 new WSU_Extended_Events_Calendar();
