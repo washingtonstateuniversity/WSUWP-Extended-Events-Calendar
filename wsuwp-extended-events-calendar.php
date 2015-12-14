@@ -89,11 +89,11 @@ class WSU_Extended_Events_Calendar {
 			'update_callback' => 'esc_html',
 			'schema' => null,
 		);
-		register_api_field( 'tribe_events', 'event_city', $args );
-		register_api_field( 'tribe_events', 'event_state', $args );
-		register_api_field( 'tribe_events', 'event_venue', $args );
-		register_api_field( 'tribe_events', 'start_date', $args );
-		register_api_field( 'tribe_events', 'end_date', $args );
+		register_rest_field( 'tribe_events', 'event_city', $args );
+		register_rest_field( 'tribe_events', 'event_state', $args );
+		register_rest_field( 'tribe_events', 'event_venue', $args );
+		register_rest_field( 'tribe_events', 'start_date', $args );
+		register_rest_field( 'tribe_events', 'end_date', $args );
 	}
 }
 new WSU_Extended_Events_Calendar();
