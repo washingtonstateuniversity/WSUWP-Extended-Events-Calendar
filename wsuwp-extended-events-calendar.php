@@ -16,6 +16,7 @@ class WSU_Extended_Events_Calendar {
 		add_action( 'rest_api_init', array( $this, 'register_api_fields' ) );
 		add_filter( 'tribe_events_pro_recurrence_batch_size', array( $this, 'limit_recurring_batch_size' ), 10 );
 		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
+		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
 	}
 
 	/**
@@ -94,6 +95,18 @@ class WSU_Extended_Events_Calendar {
 		register_rest_field( 'tribe_events', 'event_venue', $args );
 		register_rest_field( 'tribe_events', 'start_date', $args );
 		register_rest_field( 'tribe_events', 'end_date', $args );
+	}
+
+	/**
+	 * The Events Calendar Pro offers geolocation for venues. While we'll use that, we don't want
+	 * to show a notice on every page of the admin when geopoints need to be generated.
+	 */
+	public function remove_events_calendar_actions() {
+		if ( class_exists( 'Tribe__Events__Pro__Geo_Loc' ) ) {
+			$tribe_events =  Tribe__Events__Pro__Geo_Loc::instance();
+			remove_action( 'admin_init', array( $tribe_events, 'maybe_generate_geopoints_for_all_venues' ) );
+			remove_action( 'admin_init', array( $tribe_events, 'maybe_offer_generate_geopoints' ) );
+		}
 	}
 }
 new WSU_Extended_Events_Calendar();
