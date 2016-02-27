@@ -72,6 +72,10 @@ class WSU_Extended_Events_Calendar {
 			return esc_url( tribe_get_event_website_url( $object['id'] ) );
 		}
 
+		if ( 'event_cost' === $field ) {
+			return esc_html( tribe_get_cost( $object['id'], true ) );
+		}
+
 		if ( 'event_excerpt' === $field ) {
 			$content = wp_strip_all_tags( $object['content']['rendered'] );
 			return $content;
@@ -103,6 +107,7 @@ class WSU_Extended_Events_Calendar {
 		register_rest_field( 'tribe_events', 'event_state', $args );
 		register_rest_field( 'tribe_events', 'event_venue', $args );
 		register_rest_field( 'tribe_events', 'event_website', $args );
+		register_rest_field( 'tribe_events', 'event_cost', $args );
 		register_rest_field( 'tribe_events', 'event_excerpt', $args );
 		register_rest_field( 'tribe_events', 'start_date', $args );
 		register_rest_field( 'tribe_events', 'end_date', $args );
