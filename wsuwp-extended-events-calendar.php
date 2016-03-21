@@ -17,6 +17,7 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'tribe_events_pro_recurrence_batch_size', array( $this, 'limit_recurring_batch_size' ), 10 );
 		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
 		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
+		add_action( 'init', array( $this, 'add_university_taxonomies' ), 12 );
 	}
 
 	/**
@@ -142,6 +143,20 @@ class WSU_Extended_Events_Calendar {
 			$tribe_events =  Tribe__Events__Pro__Geo_Loc::instance();
 			remove_action( 'admin_init', array( $tribe_events, 'maybe_generate_geopoints_for_all_venues' ) );
 			remove_action( 'admin_init', array( $tribe_events, 'maybe_offer_generate_geopoints' ) );
+		}
+	}
+
+	/**
+	 * Add University Taxonomies to The Events Calendar post types.
+	 */
+	public function add_university_taxonomies() {
+		$taxonomies = array( 'wsuwp_university_category', 'wsuwp_university_location', 'wsuwp_university_org' );
+		$post_types = array( 'tribe_events', 'tribe_venue', 'tribe_organizer' );
+
+		foreach ( $taxonomies as $taxonomy ) {
+			foreach ( $post_types as $post_type ) {
+				register_taxonomy_for_object_type( $taxonomy, $post_type );
+			}
 		}
 	}
 }
