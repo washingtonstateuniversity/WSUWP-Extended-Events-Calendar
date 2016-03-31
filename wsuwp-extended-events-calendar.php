@@ -18,6 +18,7 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
 		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
 		add_action( 'init', array( $this, 'add_university_taxonomies' ), 12 );
+		add_filter( 'rest_tribe_events_query', array( $this, 'filter_rest_query' ), 10, 1 );
 	}
 
 	/**
@@ -158,6 +159,21 @@ class WSU_Extended_Events_Calendar {
 				register_taxonomy_for_object_type( $taxonomy, $post_type );
 			}
 		}
+	}
+
+	/**
+	 * Filter the REST API query to remove any default order and orderby arguments. This allows
+	 * The Events Calendar to have control over the ordering of the response.
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public function filter_rest_query( $args ) {
+		unset( $args['orderby'] );
+		unset( $args['order'] );
+
+		return $args;
 	}
 }
 new WSU_Extended_Events_Calendar();
