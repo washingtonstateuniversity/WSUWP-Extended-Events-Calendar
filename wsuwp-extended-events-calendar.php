@@ -19,6 +19,8 @@ class WSU_Extended_Events_Calendar {
 		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
 		add_action( 'init', array( $this, 'add_university_taxonomies' ), 12 );
 		add_filter( 'rest_tribe_events_query', array( $this, 'filter_rest_query' ), 10, 1 );
+		add_action( 'tribe_settings_do_tabs', array( $this, 'add_title_fields' ), 14 );
+		add_filter( 'spine_sub_header_default', array( $this, 'spine_sub_header' ) );
 	}
 
 	/**
@@ -174,6 +176,78 @@ class WSU_Extended_Events_Calendar {
 		unset( $args['order'] );
 
 		return $args;
+	}
+
+	/**
+	 * Add Spine Header fields to the General tab on the Events Settings page.
+	 */
+	public function add_title_fields() {
+		$generalTab = array(
+			'priority' => 11,
+			'fields' => array(
+				'wsuwp-spine-theme-headers-open' => array(
+					'type' => 'html',
+					'html' => '<div class="tribe-settings-form-wrap"><h3>Spine Theme Header</h3>',
+				),
+				'events-header' => array(
+					'type' => 'text',
+					'label' => 'All events page header',
+					'tooltip' => 'The bottom Spine Header text to display when viewing the All Events page',
+					'default' => 'Events',
+					'validation_type' => 'html',
+				),
+				'event-header' => array(
+					'type' => 'text',
+					'label' => 'Single event header',
+					'tooltip' => 'The bottom Spine Header text to display when viewing an individual event. Checking the "Use article title in main header" customizer option will override this.',
+					'default' => 'Upcoming Events',
+					'validation_type' => 'html',
+				),
+				'wsuwp-spine-theme-headers-close' => array(
+					'type' => 'html',
+					'html' => '</div>',
+				),
+			),
+		);
+		new Tribe__Settings_Tab( 'general', __('General', 'tribe-events-calendar'), $generalTab);
+	}
+
+	/**
+	 * Filter bottom Spine Header text.
+	 */
+	public function spine_sub_header( $sub_header_default ) {
+
+		// The Events Calendar archive.
+		if ( is_post_type_archive( 'tribe_events' ) ) {
+			// Use  what The Events Calendar's `tribe_get_events_title()` function returns as the default.
+			$sub_header_default = tribe_get_events_title();
+
+			// If the events header calendar option has a value, use it as the bottom header text.
+			$events_calendar_options = get_option( 'tribe_events_calendar_options' );
+			if ( is_array( $events_calendar_options ) && array_key_exists( 'events-header', $events_calendar_options ) && '' !== $events_calendar_options['events-header']  ) {
+				$sub_header_default = esc_html( $events_calendar_options['events-header'] );
+			}
+		}
+
+		// Single events from The Events Calendar.
+		if ( is_singular( 'tribe_events' ) ) {
+			// Manually set the default.
+			$sub_header_default = 'Upcoming Events';
+
+			// If the event header calendar option has a value, use it as the bottom header text.
+			$events_calendar_options = get_option( 'tribe_events_calendar_options' );
+			if ( is_array( $events_calendar_options ) && array_key_exists( 'event-header', $events_calendar_options ) && '' !== $events_calendar_options['event-header']  ) {
+				$sub_header_default = esc_html( $events_calendar_options['event-header'] );
+			}
+
+			// For some reason, `get_the_title()` returns empty in this context.
+			// `single_post_title()` does the trick, though.
+			if ( true === spine_get_option( 'articletitle_header' ) ) {
+				$sub_header_default = single_post_title( '', false );
+			}
+		}
+
+		return $sub_header_default;
 	}
 }
 new WSU_Extended_Events_Calendar();
