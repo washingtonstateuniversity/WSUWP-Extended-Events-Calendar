@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WSU Extended Events Calendar
-Version: 0.2.0
+Version: 0.2.1
 Plugin URI: https://web.wsu.edu/
 Description: Extends and modifies default functionality in The Events Calendar.
 Author: washingtonstateuniversity, jeremyfelt
@@ -17,10 +17,12 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'tribe_events_pro_recurrence_batch_size', array( $this, 'limit_recurring_batch_size' ), 10 );
 		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
 		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
+		add_action( 'plugins_loaded', array( $this, 'remove_events_calendar_app_shop' ), 11 );
 		add_action( 'init', array( $this, 'add_university_taxonomies' ), 12 );
 		add_filter( 'rest_tribe_events_query', array( $this, 'filter_rest_query' ), 10, 1 );
 		add_action( 'tribe_settings_do_tabs', array( $this, 'add_title_fields' ), 14 );
 		add_filter( 'spine_sub_header_default', array( $this, 'spine_sub_header' ) );
+		add_filter( 'tribe_events_show_licenses_tab', '__return_false' );
 	}
 
 	/**
@@ -146,6 +148,22 @@ class WSU_Extended_Events_Calendar {
 			$tribe_events =  Tribe__Events__Pro__Geo_Loc::instance();
 			remove_action( 'admin_init', array( $tribe_events, 'maybe_generate_geopoints_for_all_venues' ) );
 			remove_action( 'admin_init', array( $tribe_events, 'maybe_offer_generate_geopoints' ) );
+		}
+
+		if ( class_exists( 'Tribe__Events__Main' ) ) {
+			$tribe_events = Tribe__Events__Main::instance();
+			remove_action( 'tribe_settings_do_tabs', array( $tribe_events, 'do_addons_api_settings_tab' ) );
+		}
+	}
+
+	/**
+	 * Removes the app shop page from the Events Calendar sub menu.
+	 */
+	public function remove_events_calendar_app_shop() {
+		if ( class_exists( 'Tribe__App_Shop' ) ) {
+			$tribe_app_shop = Tribe__App_Shop::instance();
+			remove_action( 'admin_menu', array( $tribe_app_shop, 'add_menu_page' ), 100 );
+			remove_action( 'wp_before_admin_bar_render', array( $tribe_app_shop, 'add_toolbar_item' ), 20 );
 		}
 	}
 
