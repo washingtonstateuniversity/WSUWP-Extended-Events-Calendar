@@ -21,6 +21,7 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'rest_tribe_events_query', array( $this, 'filter_rest_query' ), 10, 1 );
 		add_action( 'tribe_settings_do_tabs', array( $this, 'add_title_fields' ), 14 );
 		add_filter( 'spine_sub_header_default', array( $this, 'spine_sub_header' ) );
+		add_filter( 'tribe_events_show_licenses_tab', '__return_false' );
 	}
 
 	/**
