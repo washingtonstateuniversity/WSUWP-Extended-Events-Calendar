@@ -146,7 +146,7 @@ class WSU_Extended_Events_Calendar {
 	 */
 	public function remove_events_calendar_actions() {
 		if ( class_exists( 'Tribe__Events__Pro__Geo_Loc' ) ) {
-			$tribe_events =  Tribe__Events__Pro__Geo_Loc::instance();
+			$tribe_events = Tribe__Events__Pro__Geo_Loc::instance();
 			remove_action( 'admin_init', array( $tribe_events, 'maybe_generate_geopoints_for_all_venues' ) );
 			remove_action( 'admin_init', array( $tribe_events, 'maybe_offer_generate_geopoints' ) );
 		}
@@ -201,7 +201,7 @@ class WSU_Extended_Events_Calendar {
 	 * Add Spine Header fields to the General tab on the Events Settings page.
 	 */
 	public function add_title_fields() {
-		$generalTab = array(
+		$general_tab = array(
 			'priority' => 11,
 			'fields' => array(
 				'wsuwp-spine-theme-headers-open' => array(
@@ -228,7 +228,7 @@ class WSU_Extended_Events_Calendar {
 				),
 			),
 		);
-		new Tribe__Settings_Tab( 'general', __('General', 'tribe-events-calendar'), $generalTab);
+		new Tribe__Settings_Tab( 'general', __( 'General', 'tribe-events-calendar' ), $general_tab );
 	}
 
 	/**
