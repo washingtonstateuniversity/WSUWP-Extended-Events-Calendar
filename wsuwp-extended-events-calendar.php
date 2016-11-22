@@ -23,6 +23,7 @@ class WSU_Extended_Events_Calendar {
 		add_action( 'tribe_settings_do_tabs', array( $this, 'add_title_fields' ), 14 );
 		add_filter( 'spine_sub_header_default', array( $this, 'spine_sub_header' ) );
 		add_filter( 'tribe_events_show_licenses_tab', '__return_false' );
+		add_filter( 'Tribe__Events__Pro__Recurrence_Meta_getRecurrenceMeta', array( $this, 'fix_missing_exclusions' ) );
 	}
 
 	/**
@@ -266,6 +267,28 @@ class WSU_Extended_Events_Calendar {
 		}
 
 		return $sub_header_default;
+	}
+
+	/**
+	 * Fixes a PHP Warning when the `exclusions` key is missing from recurrence meta.
+	 *
+	 * It seems that it was at one time possible for recurrence meta to be stored for
+	 * an event without exclusions data attached. Now, the code in Events Calendar Pro
+	 * that expects this exclusions data will generate a PHP Warning if it is not there.
+	 *
+	 * We've tried opening a support ticket with Modern Tribe, but the issue has not
+	 * been resolved upstream. This should be a good enough workaround.
+	 *
+	 * @param array $recurrence_meta
+	 *
+	 * @return array
+	 */
+	public function fix_missing_exclusions( $recurrence_meta ) {
+		if ( ! isset( $recurrence_meta['exclusions'] ) ) {
+			$recurrence_meta['exclusions'] = array();
+		}
+
+		return $recurrence_meta;
 	}
 }
 new WSU_Extended_Events_Calendar();
