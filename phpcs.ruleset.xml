@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<ruleset name="WSUWP Plugin">
+    <rule ref="WordPress-Extra">
+        <exclude name="WordPress.NamingConventions.ValidFunctionName" />
+    </rule>
+</ruleset>
