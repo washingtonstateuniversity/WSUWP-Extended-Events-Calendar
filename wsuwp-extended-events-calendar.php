@@ -24,6 +24,8 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'spine_sub_header_default', array( $this, 'spine_sub_header' ) );
 		add_filter( 'tribe_events_show_licenses_tab', '__return_false' );
 		add_filter( 'Tribe__Events__Pro__Recurrence_Meta_getRecurrenceMeta', array( $this, 'fix_missing_exclusions' ) );
+		add_action( 'tribe_settings_do_tabs', array( $this, 'add_custom_community_settings' ), 14 );
+		add_action( 'tribe_community_events_form_errors', array( $this, 'community_events_submission_details' ) );
 	}
 
 	/**
@@ -289,6 +291,186 @@ class WSU_Extended_Events_Calendar {
 		}
 
 		return $recurrence_meta;
+	}
+
+	/**
+	 * Add custom fields to the Community tab on the Events Settings page.
+	 */
+	public function add_custom_community_settings() {
+		if ( ! class_exists( 'Tribe__Events__Community__Main' ) ) {
+			return;
+		}
+
+		$community_tab = array(
+			'priority' => 40,
+			'fields' => array(
+				'wsuwp-community-submission-open' => array(
+					'type' => 'html',
+					'html' => '<div class="tribe-settings-form-wrap"><h3>Successful Submission Message</h3>',
+				),
+				'review-message' => array(
+					'type' => 'textarea',
+					'label' => 'Custom message',
+					'tooltip' => 'Additional text to display when an event has been successfully submitted.',
+					'default' => false,
+					'validation_type' => 'html',
+				),
+				'review-details' => array(
+					'type' => 'checkbox_bool',
+					'label' => 'Include event details',
+					'tooltip' => 'Display the details of a successfully submitted event.',
+					'default' => false,
+					'validation_type' => 'boolean',
+				),
+				'wsuwp-community-submission-close' => array(
+					'type' => 'html',
+					'html' => '</div>',
+				),
+			),
+		);
+		new Tribe__Settings_Tab( 'community', __( 'Community', 'tribe-events-calendar' ), $community_tab );
+	}
+
+	/**
+	 * Display details with the event submitted/updated message.
+	 *
+	 * @param array $errors Existing error messages.
+	 *
+	 * @return mixed
+	 */
+	public function community_events_submission_details( $errors ) {
+		$options = get_option( 'tribe_events_calendar_options' );
+
+		if ( ! is_array( $options ) ) {
+			return $errors;
+		}
+
+		$custom_message = ( array_key_exists( 'review-message', $options ) && '' !== $options['review-message']  ) ? $options['review-message'] : false;
+		$event_details = ( array_key_exists( 'review-details', $options ) && true === $options['review-details'] ) ? true : false;
+
+		if ( ! $custom_message && ! $event_details ) {
+			return $errors;
+		}
+
+		if ( is_array( $errors ) && 'update' === $errors[0]['type'] ) {
+
+			// Retrieve the ID of the submitted event.
+			preg_match( '!\d+!', $errors[0]['message'], $match );
+			$event_id = $match[0];
+
+			// Split the existing message - we'll put our message between default paragraphs.
+			$existing_message = explode( '</p>', $errors[0]['message'] );
+
+			// Remove the blank value at the end of the array.
+			array_pop( $existing_message );
+
+			// Store the paragraph with the "Submit another event" link for later.
+			$submit_another = array_pop( $existing_message );
+
+			// First portion of the original message.
+			$details = implode( '</p>', $existing_message ) . '</p>';
+
+			// Custom message.
+			if ( $custom_message ) {
+				$details .= wp_kses_post( $custom_message );
+			}
+
+			// Event details.
+			if ( $event_details ) {
+				$details .= '<div class="event-details">';
+				$details .= '<p>' . get_the_title( $event_id ) . '</p>';
+				$details .= wpautop( get_post( $event_id )->post_content );
+				$details .= tribe_get_event_categories( $event_id );
+				$details .= tribe_event_featured_image( $event_id );
+
+				// Event details - date/time information.
+				if ( tribe_get_start_date( $event_id ) ) {
+					$details .= '<p>' . tribe_get_start_date( $event_id ) . ' ';
+
+					if ( tribe_event_is_all_day( $event_id ) ) {
+						$details .= '- all day event';
+					} else {
+						$details .= 'to ';
+						if ( tribe_get_start_date( $event_id, false ) !== tribe_get_end_date( $event_id, false ) ) {
+							$details .= tribe_get_end_date( $event_id );
+						} else {
+							$details .= tribe_get_end_time( $event_id );
+						}
+					}
+
+					$details .= '</p>';
+
+					// Recurrence info.
+					if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
+						if ( tribe_get_recurrence_start_dates( $event_id ) ) {
+							// Markup based on the output of `tribe_get_event_categories`
+							$details .= '<div>Event reccurence:</div><ul class="event-recurrence">';
+
+							foreach ( tribe_get_recurrence_start_dates( $event_id ) as $recurrence ) {
+								$details .= '<li>' . $recurrence . '</li>';
+							}
+
+							$details .= '</ul>';
+						}
+						if ( tribe_get_recurrence_text( $event_id ) ) {
+							$details .= '<p>' . tribe_get_recurrence_text( $event_id ) . '</p>';
+						}
+					}
+				}
+
+				// Event details - venue information.
+				if ( tribe_get_venue_details( $event_id ) ) {
+					$details .= '<p>' . implode( '<br />', tribe_get_venue_details( $event_id ) ) . '</p>';
+				}
+
+				// Event details - organizer information.
+				if ( tribe_get_organizer_ids( $event_id ) ) {
+					foreach ( tribe_get_organizer_ids( $event_id ) as $organizer_id ) {
+						// `tribe_get_organizer_details()` doesn't seem to work as expected,
+						// so build the individual pieces out manually.
+						if ( tribe_get_organizer( $organizer_id ) ) {
+							$details .= '<p>' . tribe_get_organizer( $organizer_id );
+
+							if ( tribe_get_organizer_phone( $organizer_id ) ) {
+								$details .= '<br />' . tribe_get_organizer_phone( $organizer_id );
+							}
+
+							if ( tribe_get_organizer_website_url( $organizer_id ) ) {
+								$details .= '<br />' . esc_url( tribe_get_organizer_website_url( $organizer_id ) );
+							}
+
+							if ( tribe_get_organizer_email( $organizer_id ) ) {
+								$details .= '<br />' . esc_html( tribe_get_organizer_website_link( $organizer_id ) );
+							}
+
+							$details .= '</p>';
+						}
+					}
+				}
+
+				// Event details - website.
+				if ( tribe_get_event_website_url( $event_id ) ) {
+					$details .= '<p>' . tribe_get_event_website_url( $event_id ) . '</p>';
+				}
+
+				// Event details - cost.
+				if ( tribe_get_formatted_cost( $event_id ) ) {
+					$details .= '<p>' . tribe_get_formatted_cost( $event_id ) . '</p>';
+				}
+
+				$details .= '</div>';
+			}
+
+			// Append the rest of the existing message.
+			$details .= $submit_another . '</p>';
+
+			$errors[0] = array(
+				'type' => $errors[0]['type'],
+				'message' => $details,
+			);
+		}
+
+		return $errors;
 	}
 }
 new WSU_Extended_Events_Calendar();
