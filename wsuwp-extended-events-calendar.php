@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WSU Extended Events Calendar
-Version: 0.3.0
+Version: 0.4.0
 Plugin URI: https://web.wsu.edu/
 Description: Extends and modifies default functionality in The Events Calendar.
 Author: washingtonstateuniversity, jeremyfelt
