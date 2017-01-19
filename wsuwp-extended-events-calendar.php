@@ -20,11 +20,11 @@ class WSU_Extended_Events_Calendar {
 		add_action( 'plugins_loaded', array( $this, 'remove_events_calendar_app_shop' ), 11 );
 		add_action( 'init', array( $this, 'add_university_taxonomies' ), 12 );
 		add_filter( 'rest_tribe_events_query', array( $this, 'filter_rest_query' ), 10, 1 );
-		add_action( 'tribe_settings_do_tabs', array( $this, 'add_title_fields' ), 14 );
+		add_action( 'tribe_settings_tab_fields', array( $this, 'add_title_fields' ), 10, 2 );
 		add_filter( 'spine_sub_header_default', array( $this, 'spine_sub_header' ) );
 		add_filter( 'tribe_events_show_licenses_tab', '__return_false' );
 		add_filter( 'Tribe__Events__Pro__Recurrence_Meta_getRecurrenceMeta', array( $this, 'fix_missing_exclusions' ) );
-		add_action( 'tribe_settings_do_tabs', array( $this, 'add_custom_community_settings' ), 14 );
+		add_action( 'tribe_settings_tab_fields', array( $this, 'add_custom_community_settings' ), 10, 2 );
 		add_action( 'tribe_community_events_form_errors', array( $this, 'community_events_submission_details' ) );
 	}
 
@@ -201,36 +201,41 @@ class WSU_Extended_Events_Calendar {
 
 	/**
 	 * Add Spine Header fields to the General tab on the Events Settings page.
+	 *
+	 * @param  array  $settings Existing array of The Events Calendar settings fields.
+	 * @param  string $id       The tab ID.
+	 *
+	 * @return array
 	 */
-	public function add_title_fields() {
-		$general_tab = array(
-			'priority' => 11,
-			'fields' => array(
-				'wsuwp-spine-theme-headers-open' => array(
-					'type' => 'html',
-					'html' => '<div class="tribe-settings-form-wrap"><h3>Spine Theme Header</h3>',
-				),
-				'events-header' => array(
-					'type' => 'text',
-					'label' => 'All events page header',
-					'tooltip' => 'The bottom Spine Header text to display when viewing the All Events page',
-					'default' => 'Events',
-					'validation_type' => 'html',
-				),
-				'event-header' => array(
-					'type' => 'text',
-					'label' => 'Single event header',
-					'tooltip' => 'The bottom Spine Header text to display when viewing an individual event. Checking the "Use article title in main header" customizer option will override this.',
-					'default' => 'Upcoming Events',
-					'validation_type' => 'html',
-				),
-				'wsuwp-spine-theme-headers-close' => array(
-					'type' => 'html',
-					'html' => '</div>',
-				),
-			),
-		);
-		new Tribe__Settings_Tab( 'general', __( 'General', 'tribe-events-calendar' ), $general_tab );
+	public function add_title_fields( $settings, $id ) {
+		if ( 'general' === $id ) {
+			$settings = Tribe__Main::array_insert_after_key(
+				'tribe_events_timezones_show_zone',
+				$settings,
+				array(
+					'wsuwp-spine-theme-headers-open' => array(
+						'type' => 'html',
+						'html' => '<h3>Spine Theme Header</h3>',
+					),
+					'events-spine-header' => array(
+						'type' => 'text',
+						'label' => 'All events page header',
+						'tooltip' => 'The bottom Spine Header text to display when viewing the All Events page',
+						'default' => 'Events',
+						'validation_type' => 'html',
+					),
+					'event-spine-header' => array(
+						'type' => 'text',
+						'label' => 'Single event header',
+						'tooltip' => 'The bottom Spine Header text to display when viewing an individual event. Checking the "Use article title in main header" customizer option will override this.',
+						'default' => 'Upcoming Events',
+						'validation_type' => 'html',
+					),
+				)
+			);
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -295,40 +300,41 @@ class WSU_Extended_Events_Calendar {
 
 	/**
 	 * Add custom fields to the Community tab on the Events Settings page.
+	 *
+	 * @param  array  $settings Existing array of The Events Calendar settings fields.
+	 * @param  string $id       The tab ID.
+	 *
+	 * @return array
 	 */
-	public function add_custom_community_settings() {
-		if ( ! class_exists( 'Tribe__Events__Community__Main' ) ) {
-			return;
+	public function add_custom_community_settings( $settings, $id ) {
+		if ( class_exists( 'Tribe__Events__Community__Main' ) && 'community' === $id ) {
+			$settings = Tribe__Main::array_insert_after_key(
+				'single_geography_mode',
+				$settings,
+				array(
+					'wsuwp-community-submission-open' => array(
+						'type' => 'html',
+						'html' => '<h3>Successful Submission Message</h3>',
+					),
+					'review-message' => array(
+						'type' => 'textarea',
+						'label' => 'Custom message',
+						'tooltip' => 'Additional text to display when an event has been successfully submitted.',
+						'default' => false,
+						'validation_type' => 'html',
+					),
+					'review-details' => array(
+						'type' => 'checkbox_bool',
+						'label' => 'Include event details',
+						'tooltip' => 'Display the details of a successfully submitted event.',
+						'default' => false,
+						'validation_type' => 'boolean',
+					),
+				)
+			);
 		}
 
-		$community_tab = array(
-			'priority' => 40,
-			'fields' => array(
-				'wsuwp-community-submission-open' => array(
-					'type' => 'html',
-					'html' => '<div class="tribe-settings-form-wrap"><h3>Successful Submission Message</h3>',
-				),
-				'review-message' => array(
-					'type' => 'textarea',
-					'label' => 'Custom message',
-					'tooltip' => 'Additional text to display when an event has been successfully submitted.',
-					'default' => false,
-					'validation_type' => 'html',
-				),
-				'review-details' => array(
-					'type' => 'checkbox_bool',
-					'label' => 'Include event details',
-					'tooltip' => 'Display the details of a successfully submitted event.',
-					'default' => false,
-					'validation_type' => 'boolean',
-				),
-				'wsuwp-community-submission-close' => array(
-					'type' => 'html',
-					'html' => '</div>',
-				),
-			),
-		);
-		new Tribe__Settings_Tab( 'community', __( 'Community', 'tribe-events-calendar' ), $community_tab );
+		return $settings;
 	}
 
 	/**
