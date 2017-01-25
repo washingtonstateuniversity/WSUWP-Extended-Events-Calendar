@@ -361,7 +361,7 @@ class WSU_Extended_Events_Calendar {
 		if ( is_array( $errors ) && 'update' === $errors[0]['type'] ) {
 
 			// Retrieve the ID of the submitted event.
-			$event = get_page_by_title( $_POST['post_title'], OBJECT, 'tribe_events' );
+			$event = get_page_by_title( sanitize_text_field( $_POST['post_title'] ), OBJECT, 'tribe_events' );
 			$event_id = $event->ID;
 
 			// Split the existing message - we'll put our message between default paragraphs.
