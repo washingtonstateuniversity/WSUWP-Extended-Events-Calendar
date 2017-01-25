@@ -361,8 +361,8 @@ class WSU_Extended_Events_Calendar {
 		if ( is_array( $errors ) && 'update' === $errors[0]['type'] ) {
 
 			// Retrieve the ID of the submitted event.
-			preg_match( '!\d+!', $errors[0]['message'], $match );
-			$event_id = $match[0];
+			$event = get_page_by_title( $_POST['post_title'], OBJECT, 'tribe_events' );
+			$event_id = $event->ID;
 
 			// Split the existing message - we'll put our message between default paragraphs.
 			$existing_message = explode( '</p>', $errors[0]['message'] );
