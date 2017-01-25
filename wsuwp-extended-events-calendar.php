@@ -354,7 +354,7 @@ class WSU_Extended_Events_Calendar {
 		$custom_message = ( array_key_exists( 'review-message', $options ) && '' !== $options['review-message']  ) ? $options['review-message'] : false;
 		$event_details = ( array_key_exists( 'review-details', $options ) && true === $options['review-details'] ) ? true : false;
 
-		if ( ! $custom_message && ! $event_details ) {
+		if ( ! $custom_message && ! $event_details && ! wp_verify_nonce( $_POST['_wpnonce'], 'ecp_event_submission' ) ) {
 			return $errors;
 		}
 
