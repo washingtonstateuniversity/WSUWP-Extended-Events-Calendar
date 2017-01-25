@@ -354,15 +354,15 @@ class WSU_Extended_Events_Calendar {
 		$custom_message = ( array_key_exists( 'review-message', $options ) && '' !== $options['review-message']  ) ? $options['review-message'] : false;
 		$event_details = ( array_key_exists( 'review-details', $options ) && true === $options['review-details'] ) ? true : false;
 
-		if ( ! $custom_message && ! $event_details ) {
+		if ( ! $custom_message && ! $event_details && ! wp_verify_nonce( $_POST['_wpnonce'], 'ecp_event_submission' ) ) {
 			return $errors;
 		}
 
 		if ( is_array( $errors ) && 'update' === $errors[0]['type'] ) {
 
 			// Retrieve the ID of the submitted event.
-			preg_match( '!\d+!', $errors[0]['message'], $match );
-			$event_id = $match[0];
+			$event = get_page_by_title( sanitize_text_field( $_POST['post_title'] ), OBJECT, 'tribe_events' );
+			$event_id = $event->ID;
 
 			// Split the existing message - we'll put our message between default paragraphs.
 			$existing_message = explode( '</p>', $errors[0]['message'] );
@@ -384,14 +384,18 @@ class WSU_Extended_Events_Calendar {
 			// Event details.
 			if ( $event_details ) {
 				$details .= '<div class="event-details">';
-				$details .= '<p>' . get_the_title( $event_id ) . '</p>';
-				$details .= wpautop( get_post( $event_id )->post_content );
+				$details .= '<div>Event Title:</div><p>' . get_the_title( $event_id ) . '</p>';
+				$details .= '<div>Event Description:</div>' . wpautop( get_post( $event_id )->post_content );
 				$details .= tribe_get_event_categories( $event_id );
-				$details .= tribe_event_featured_image( $event_id );
+
+				// Event image.
+				if ( tribe_event_featured_image( $event_id ) ) {
+					$details .= '<div>Event Image:</div>' . tribe_event_featured_image( $event_id );
+				}
 
 				// Event details - date/time information.
 				if ( tribe_get_start_date( $event_id ) ) {
-					$details .= '<p>' . tribe_get_start_date( $event_id ) . ' ';
+					$details .= '<div>Event Time &amp; Date:</div><p>' . tribe_get_start_date( $event_id ) . ' ';
 
 					if ( tribe_event_is_all_day( $event_id ) ) {
 						$details .= '- all day event';
@@ -408,8 +412,7 @@ class WSU_Extended_Events_Calendar {
 
 					// Recurrence info.
 					if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
-						if ( tribe_get_recurrence_start_dates( $event_id ) ) {
-							// Markup based on the output of `tribe_get_event_categories`
+						if ( tribe_is_recurring_event( $event_id ) ) {
 							$details .= '<div>Event reccurence:</div><ul class="event-recurrence">';
 
 							foreach ( tribe_get_recurrence_start_dates( $event_id ) as $recurrence ) {
@@ -425,8 +428,8 @@ class WSU_Extended_Events_Calendar {
 				}
 
 				// Event details - venue information.
-				if ( tribe_get_venue_details( $event_id ) ) {
-					$details .= '<p>' . implode( '<br />', tribe_get_venue_details( $event_id ) ) . '</p>';
+				if ( tribe_get_venue_id( $event_id ) ) {
+					$details .= '<div>Venue Details:</div><p>' . implode( '<br />', tribe_get_venue_details( $event_id ) ) . '</p>';
 				}
 
 				// Event details - organizer information.
@@ -435,7 +438,7 @@ class WSU_Extended_Events_Calendar {
 						// `tribe_get_organizer_details()` doesn't seem to work as expected,
 						// so build the individual pieces out manually.
 						if ( tribe_get_organizer( $organizer_id ) ) {
-							$details .= '<p>' . tribe_get_organizer( $organizer_id );
+							$details .= '<div>Organizer Details:</div><p>' . tribe_get_organizer( $organizer_id );
 
 							if ( tribe_get_organizer_phone( $organizer_id ) ) {
 								$details .= '<br />' . tribe_get_organizer_phone( $organizer_id );
@@ -456,12 +459,12 @@ class WSU_Extended_Events_Calendar {
 
 				// Event details - website.
 				if ( tribe_get_event_website_url( $event_id ) ) {
-					$details .= '<p>' . tribe_get_event_website_url( $event_id ) . '</p>';
+					$details .= '<div>Event Website:</div><p>' . tribe_get_event_website_url( $event_id ) . '</p>';
 				}
 
 				// Event details - cost.
 				if ( tribe_get_formatted_cost( $event_id ) ) {
-					$details .= '<p>' . tribe_get_formatted_cost( $event_id ) . '</p>';
+					$details .= '<div>Event Cost:</div><p>' . tribe_get_formatted_cost( $event_id ) . '</p>';
 				}
 
 				$details .= '</div>';
