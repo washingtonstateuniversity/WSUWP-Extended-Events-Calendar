@@ -428,7 +428,7 @@ class WSU_Extended_Events_Calendar {
 				}
 
 				// Event details - venue information.
-				if ( tribe_get_venue_details( $event_id ) ) {
+				if ( tribe_get_venue_id( $event_id ) ) {
 					$details .= '<div>Venue Details:</div><p>' . implode( '<br />', tribe_get_venue_details( $event_id ) ) . '</p>';
 				}
 
