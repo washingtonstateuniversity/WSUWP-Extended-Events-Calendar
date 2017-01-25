@@ -412,7 +412,7 @@ class WSU_Extended_Events_Calendar {
 
 					// Recurrence info.
 					if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
-						if ( tribe_get_recurrence_start_dates( $event_id ) ) {
+						if ( tribe_is_recurring_event( $event_id ) ) {
 							$details .= '<div>Event reccurence:</div><ul class="event-recurrence">';
 
 							foreach ( tribe_get_recurrence_start_dates( $event_id ) as $recurrence ) {
