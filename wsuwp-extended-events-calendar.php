@@ -14,6 +14,7 @@ class WSU_Extended_Events_Calendar {
 	 */
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_api_fields' ) );
+		add_filter( 'tribe_aggregator_should_load', '__return_false' );
 		add_filter( 'tribe_events_pro_recurrence_batch_size', array( $this, 'limit_recurring_batch_size' ), 10 );
 		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
 		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
