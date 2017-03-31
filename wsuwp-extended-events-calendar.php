@@ -16,6 +16,7 @@ class WSU_Extended_Events_Calendar {
 		add_action( 'rest_api_init', array( $this, 'register_api_fields' ) );
 		add_filter( 'tribe_aggregator_should_load', '__return_false' );
 		add_filter( 'tribe_events_pro_recurrence_batch_size', array( $this, 'limit_recurring_batch_size' ), 10 );
+		add_filter( 'tribe_events_pro_recurrence_processor_interval', array( $this, 'set_recurrence_cron_interval' ) );
 		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
 		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
 		add_action( 'plugins_loaded', array( $this, 'remove_events_calendar_app_shop' ), 11 );
@@ -38,6 +39,18 @@ class WSU_Extended_Events_Calendar {
 	 */
 	public function limit_recurring_batch_size() {
 		return 5;
+	}
+
+	/**
+	 * Sets the interval for processing recurrence crons at "twicedaily" instead of
+	 * every 30 minutes.
+	 *
+	 * @since 0.5.0
+	 *
+	 * @return string
+	 */
+	public function set_recurrence_cron_interval() {
+		return 'twicedaily';
 	}
 
 	/**
