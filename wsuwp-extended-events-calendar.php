@@ -8,7 +8,18 @@ Author: washingtonstateuniversity, jeremyfelt
 Author URI: https://web.wsu.edu/
 */
 
-define( 'TRIBE_HIDE_UPSELL', true );
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+if ( ! defined( 'TRIBE_HIDE_UPSELL' ) ) {
+	define( 'TRIBE_HIDE_UPSELL', true );
+}
+
+if ( ! defined( 'TRIBE_DISABLE_PUE' ) ) {
+	define( 'TRIBE_DISABLE_PUE', true );
+}
 
 class WSU_Extended_Events_Calendar {
 	/**
