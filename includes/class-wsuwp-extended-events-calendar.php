@@ -1,25 +1,4 @@
 <?php
-/*
-Plugin Name: WSU Extended Events Calendar
-Version: 0.5.0
-Plugin URI: https://web.wsu.edu/
-Description: Extends and modifies default functionality in The Events Calendar.
-Author: washingtonstateuniversity, jeremyfelt
-Author URI: https://web.wsu.edu/
-*/
-
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
-}
-
-if ( ! defined( 'TRIBE_HIDE_UPSELL' ) ) {
-	define( 'TRIBE_HIDE_UPSELL', true );
-}
-
-if ( ! defined( 'TRIBE_DISABLE_PUE' ) ) {
-	define( 'TRIBE_DISABLE_PUE', true );
-}
 
 class WSU_Extended_Events_Calendar {
 	/**
