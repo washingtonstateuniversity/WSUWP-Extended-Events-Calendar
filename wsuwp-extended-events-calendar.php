@@ -29,6 +29,7 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'Tribe__Events__Pro__Recurrence_Meta_getRecurrenceMeta', array( $this, 'fix_missing_exclusions' ) );
 		add_action( 'tribe_settings_tab_fields', array( $this, 'add_custom_community_settings' ), 10, 2 );
 		add_action( 'tribe_community_events_form_errors', array( $this, 'community_events_submission_details' ) );
+		add_filter( 'tribe_aggregator_origins', array( $this, 'filter_import_origins' ) );
 	}
 
 	/**
@@ -495,6 +496,23 @@ class WSU_Extended_Events_Calendar {
 		}
 
 		return $errors;
+	}
+
+	/**
+	 * Filters import origins to only allow import via CSV.
+	 *
+	 * @since 0.6.0
+	 *
+	 * @return array
+	 */
+	public function filter_import_origins() {
+		return array(
+			'csv' => (object) array(
+				'id' => 'csv',
+				'name' => 'CSV File',
+				'dislabed' => false,
+			),
+		);
 	}
 }
 new WSU_Extended_Events_Calendar();
