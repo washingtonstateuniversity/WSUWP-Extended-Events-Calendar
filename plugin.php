@@ -27,7 +27,6 @@ if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
 		"echo '<div class=\"error\"><p>" . __( 'WSUWP Extended Events Calendar requires PHP 5.3 to function properly. Please upgrade PHP or deactivate the plugin.', 'wsuwp-extended-events-calendar' ) . "</p></div>';" ) );
 	return;
 } else {
-	include_once __DIR__ . '/includes/class-wsuwp-extended-events-calendar.php';
 	include_once __DIR__ . '/includes/extended-events-calendar.php';
 }
 
