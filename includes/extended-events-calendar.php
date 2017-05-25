@@ -252,7 +252,7 @@ function spine_sub_header( $sub_header_default ) {
 
 		// If the events header calendar option has a value, use it as the bottom header text.
 		$events_calendar_options = get_option( 'tribe_events_calendar_options' );
-		if ( is_array( $events_calendar_options ) && array_key_exists( 'events-header', $events_calendar_options ) && '' !== $events_calendar_options['events-header']  ) {
+		if ( is_array( $events_calendar_options ) && array_key_exists( 'events-header', $events_calendar_options ) && '' !== $events_calendar_options['events-header'] ) {
 			$sub_header_default = esc_html( $events_calendar_options['events-header'] );
 		}
 	}
@@ -264,7 +264,7 @@ function spine_sub_header( $sub_header_default ) {
 
 		// If the event header calendar option has a value, use it as the bottom header text.
 		$events_calendar_options = get_option( 'tribe_events_calendar_options' );
-		if ( is_array( $events_calendar_options ) && array_key_exists( 'event-header', $events_calendar_options ) && '' !== $events_calendar_options['event-header']  ) {
+		if ( is_array( $events_calendar_options ) && array_key_exists( 'event-header', $events_calendar_options ) && '' !== $events_calendar_options['event-header'] ) {
 			$sub_header_default = esc_html( $events_calendar_options['event-header'] );
 		}
 
@@ -470,7 +470,7 @@ function community_events_submission_details( $errors ) {
 			}
 
 			$details .= '</div>';
-		}
+		} // End if().
 
 		// Append the rest of the existing message.
 		$details .= $submit_another . '</p>';
@@ -479,7 +479,7 @@ function community_events_submission_details( $errors ) {
 			'type' => $errors[0]['type'],
 			'message' => $details,
 		);
-	}
+	} // End if().
 
 	return $errors;
 }
