@@ -8,6 +8,8 @@ Author: washingtonstateuniversity, jeremyfelt
 Author URI: https://web.wsu.edu/
 */
 
+define( 'TRIBE_HIDE_UPSELL', true );
+
 class WSU_Extended_Events_Calendar {
 	/**
 	 * Setup hooks.
