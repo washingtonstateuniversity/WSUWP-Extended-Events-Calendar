@@ -19,7 +19,6 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'tribe_events_pro_recurrence_processor_interval', array( $this, 'set_recurrence_cron_interval' ) );
 		add_filter( 'tribe_events_register_event_type_args', array( $this, 'register_events_endpoint' ) );
 		add_action( 'admin_init', array( $this, 'remove_events_calendar_actions' ), 9 );
-		add_action( 'plugins_loaded', array( $this, 'remove_events_calendar_app_shop' ), 11 );
 		add_action( 'init', array( $this, 'add_university_taxonomies' ), 12 );
 		add_filter( 'rest_tribe_events_query', array( $this, 'filter_rest_query' ), 10, 1 );
 		add_action( 'tribe_settings_tab_fields', array( $this, 'add_title_fields' ), 10, 2 );
@@ -28,6 +27,10 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'Tribe__Events__Pro__Recurrence_Meta_getRecurrenceMeta', array( $this, 'fix_missing_exclusions' ) );
 		add_action( 'tribe_settings_tab_fields', array( $this, 'add_custom_community_settings' ), 10, 2 );
 		add_action( 'tribe_community_events_form_errors', array( $this, 'community_events_submission_details' ) );
+
+		// Don't load the Tribe App Shop.
+		add_action( 'plugins_loaded', array( $this, 'remove_events_calendar_app_shop' ), 11 );
+		add_filter( 'tribe_asset_pre_register', array( $this, 'filter_tribe_asset' ) );
 	}
 
 	/**
@@ -494,6 +497,24 @@ class WSU_Extended_Events_Calendar {
 		}
 
 		return $errors;
+	}
+
+	/**
+	 * Ensure that Tribe App Shop assets are never enqueued by attaching `__return_false` as
+	 * the conditional.
+	 *
+	 * @since 0.5.1
+	 *
+	 * @param object $asset The asset currently being registered.
+	 *
+	 * @return object The modified asset.
+	 */
+	public function filter_tribe_asset( $asset ) {
+		if ( 'tribe-app-shop-css' === $asset->slug || 'tribe-app-shop-js' === $asset->slug ) {
+			$asset->conditionals = array( '__return_false' );
+		}
+
+		return $asset;
 	}
 }
 new WSU_Extended_Events_Calendar();
