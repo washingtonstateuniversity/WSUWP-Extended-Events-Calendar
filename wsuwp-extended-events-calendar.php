@@ -267,7 +267,7 @@ class WSU_Extended_Events_Calendar {
 
 			// If the events header calendar option has a value, use it as the bottom header text.
 			$events_calendar_options = get_option( 'tribe_events_calendar_options' );
-			if ( is_array( $events_calendar_options ) && array_key_exists( 'events-header', $events_calendar_options ) && '' !== $events_calendar_options['events-header']  ) {
+			if ( is_array( $events_calendar_options ) && array_key_exists( 'events-header', $events_calendar_options ) && '' !== $events_calendar_options['events-header'] ) {
 				$sub_header_default = esc_html( $events_calendar_options['events-header'] );
 			}
 		}
@@ -279,7 +279,7 @@ class WSU_Extended_Events_Calendar {
 
 			// If the event header calendar option has a value, use it as the bottom header text.
 			$events_calendar_options = get_option( 'tribe_events_calendar_options' );
-			if ( is_array( $events_calendar_options ) && array_key_exists( 'event-header', $events_calendar_options ) && '' !== $events_calendar_options['event-header']  ) {
+			if ( is_array( $events_calendar_options ) && array_key_exists( 'event-header', $events_calendar_options ) && '' !== $events_calendar_options['event-header'] ) {
 				$sub_header_default = esc_html( $events_calendar_options['event-header'] );
 			}
 
@@ -368,7 +368,7 @@ class WSU_Extended_Events_Calendar {
 			return $errors;
 		}
 
-		$custom_message = ( array_key_exists( 'review-message', $options ) && '' !== $options['review-message']  ) ? $options['review-message'] : false;
+		$custom_message = ( array_key_exists( 'review-message', $options ) && '' !== $options['review-message'] ) ? $options['review-message'] : false;
 		$event_details = ( array_key_exists( 'review-details', $options ) && true === $options['review-details'] ) ? true : false;
 
 		if ( ! $custom_message && ! $event_details && ! wp_verify_nonce( $_POST['_wpnonce'], 'ecp_event_submission' ) ) {
