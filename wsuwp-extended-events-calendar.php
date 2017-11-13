@@ -202,8 +202,13 @@ class WSU_Extended_Events_Calendar {
 	}
 
 	/**
-	 * Filter the REST API query to remove any default order and orderby arguments. This allows
-	 * The Events Calendar to have control over the ordering of the response.
+	 * Filter the events REST API query before it fires.
+	 *
+	 * Remove default order and orderby arguments. This allows The Events Calendar
+	 * to have control over the ordering of the response.
+	 *
+	 * When `tribe_event_display` is passed as `past`, configure a query that
+	 * pulls past events.
 	 *
 	 * @param array $args
 	 *
@@ -212,6 +217,17 @@ class WSU_Extended_Events_Calendar {
 	public function filter_rest_query( $args ) {
 		unset( $args['orderby'] );
 		unset( $args['order'] );
+
+		if ( isset( $_REQUEST['tribe_event_display'] ) && 'past' === $_REQUEST['tribe_event_display'] ) {
+
+			// These are both required to trick The Events Calendar into a past events query.
+			$args['tribe_is_past'] = true;
+			$args['eventDisplay'] = 'past';
+
+			// The Events Calendar uses whatever date is passed as the end date for past
+			// events, so we choose yesterday.
+			$args['eventDate'] = date( 'Y-m-d 23:59:59', strtotime( 'yesterday' ) );
+		}
 
 		return $args;
 	}
