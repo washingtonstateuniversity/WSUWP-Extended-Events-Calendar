@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WSU Extended Events Calendar
-Version: 0.5.0
+Version: 0.6.0
 Plugin URI: https://web.wsu.edu/
 Description: Extends and modifies default functionality in The Events Calendar.
 Author: washingtonstateuniversity, jeremyfelt
@@ -218,7 +218,7 @@ class WSU_Extended_Events_Calendar {
 		unset( $args['orderby'] );
 		unset( $args['order'] );
 
-		if ( isset( $_REQUEST['tribe_event_display'] ) && 'past' === $_REQUEST['tribe_event_display'] ) {
+		if ( isset( $_REQUEST['tribe_event_display'] ) && 'past' === $_REQUEST['tribe_event_display'] ) { // WPCS: CSRF Ok.
 
 			// These are both required to trick The Events Calendar into a past events query.
 			$args['tribe_is_past'] = true;
