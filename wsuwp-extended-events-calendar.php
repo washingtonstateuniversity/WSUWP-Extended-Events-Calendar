@@ -387,6 +387,16 @@ class WSU_Extended_Events_Calendar {
 			return false;
 		}
 
+		// Don't allow a great number of past recurring events.
+		if ( 'recurrenceMaxMonthsBefore' === $key && 12 < $value ) {
+			return 12;
+		}
+
+		// Only allow recurring events to be created 12 months ahead.
+		if ( 'recurrenceMaxMonthsAfter' === $key && 12 < $value ) {
+			return 12;
+		}
+
 		return $value;
 	}
 
