@@ -27,6 +27,7 @@ class WSU_Extended_Events_Calendar {
 		add_filter( 'Tribe__Events__Pro__Recurrence_Meta_getRecurrenceMeta', array( $this, 'fix_missing_exclusions' ) );
 		add_action( 'tribe_settings_tab_fields', array( $this, 'add_custom_community_settings' ), 10, 2 );
 		add_action( 'tribe_community_events_form_errors', array( $this, 'community_events_submission_details' ) );
+		add_filter( 'tribe_get_option', array( $this, 'filter_tribe_options' ), 10, 2 );
 
 		// Don't load the Tribe App Shop.
 		add_action( 'plugins_loaded', array( $this, 'remove_events_calendar_app_shop' ), 11 );
@@ -368,6 +369,25 @@ class WSU_Extended_Events_Calendar {
 		}
 
 		return $settings;
+	}
+
+	/**
+	 * Force some events options to a specific value.
+	 *
+	 * @param string|bool $value
+	 * @param string      $key
+	 *
+	 * @return bool
+	 */
+	public function filter_tribe_options( $value, $key ) {
+
+		// If this is true, a MySQL error is generated at times.
+		// See https://theeventscalendar.com/support/forums/topic/invalid-sql-query-with-rest-api-and-recurring-events/
+		if ( 'hideSubsequentRecurrencesDefault' === $key ) {
+			return false;
+		}
+
+		return $value;
 	}
 
 	/**
