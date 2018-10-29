@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WSU Extended Events Calendar
-Version: 0.6.2
+Version: 0.6.3
 Plugin URI: https://web.wsu.edu/
 Description: Extends and modifies default functionality in The Events Calendar.
 Author: washingtonstateuniversity, jeremyfelt
@@ -173,7 +173,6 @@ class WSU_Extended_Events_Calendar {
 
 		if ( class_exists( 'Tribe__Events__Main' ) ) {
 			$tribe_events = Tribe__Events__Main::instance();
-			remove_action( 'tribe_settings_do_tabs', array( $tribe_events, 'do_addons_api_settings_tab' ) );
 		}
 	}
 
